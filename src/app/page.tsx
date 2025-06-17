@@ -8,7 +8,7 @@ import { getProducts as fetchAllProducts, getCategories, getProductsByCategory }
 import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Zap, Download } from 'lucide-react';
+import { Zap, Download, Sparkles, Star } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -81,46 +81,75 @@ export default function HomePage() {
   }
   
   return (
-    <div className="space-y-8">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-headline font-bold text-primary mb-2 flex items-center justify-center gap-2">
-          <Zap className="h-10 w-10" /> Welcome to CommerceFlow
-        </h1>
-        <p className="text-xl text-muted-foreground">Discover amazing digital products and services.</p>
-        <div className="mt-6">
-          {/* 
-            Placeholder Download Button: 
-            You'll need to manually ZIP your project and host it. 
-            Then, replace the '#' in the href below with the actual download link.
-          */}
-          <Button asChild variant="outline" size="lg">
+    <div className="space-y-12 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute top-40 right-20 w-24 h-24 bg-accent/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+      <div className="text-center mb-16 relative">
+        <div className="inline-block relative">
+          <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl blur-xl opacity-30 animate-pulse"></div>
+          <h1 className="text-5xl md:text-6xl font-headline font-bold text-gradient-primary mb-4 flex items-center justify-center gap-3 relative float">
+            <Zap className="h-12 w-12 md:h-16 md:w-16 text-primary animate-pulse" /> 
+            Welcome to CommerceFlow
+            <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-accent animate-pulse" style={{ animationDelay: '0.5s' }} />
+          </h1>
+        </div>
+        
+        <p className="text-xl md:text-2xl text-muted-foreground mb-8 relative decorative-dots">
+          Discover amazing digital products and services
+        </p>
+        
+        <div className="flex items-center justify-center gap-2 mb-6">
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} className="h-6 w-6 text-accent fill-current animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />
+          ))}
+        </div>
+        
+        <div className="relative inline-block">
+          <div className="absolute -inset-2 gradient-accent rounded-lg blur opacity-30 animate-pulse"></div>
+          <Button asChild variant="outline" size="lg" className="relative glow-on-hover gradient-card border-2 border-primary/20">
             <Link href="#"> 
               <Download className="mr-2 h-5 w-5" />
               Download Project ZIP (Placeholder)
             </Link>
           </Button>
-           <p className="text-sm text-muted-foreground mt-2">
-            (You need to replace the link above with your actual project ZIP URL after hosting it)
-          </p>
         </div>
+        
+        <p className="text-sm text-muted-foreground mt-4 opacity-80">
+          (You need to replace the link above with your actual project ZIP URL after hosting it)
+        </p>
       </div>
 
-      <SearchBar 
-        onSearchResults={handleSearchResults} 
-        allProducts={memoizedAllProducts} 
-        onSearchStart={() => setIsLoading(true)}
-        onSearchEnd={() => setIsLoading(false)}
-      />
+      <div className="relative">
+        <SearchBar 
+          onSearchResults={handleSearchResults} 
+          allProducts={memoizedAllProducts} 
+          onSearchStart={() => setIsLoading(true)}
+          onSearchEnd={() => setIsLoading(false)}
+        />
+      </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 justify-center">
-        {categories.map(category => (
+      <div className="flex flex-wrap gap-3 mb-12 justify-center">
+        {categories.map((category, index) => (
           <Button
             key={category}
             variant={selectedCategory === category ? 'default' : 'outline'}
             onClick={() => setSelectedCategory(category)}
-            className={selectedCategory === category ? 'bg-primary text-primary-foreground' : 'text-foreground'}
+            className={`
+              relative transition-all duration-300 glow-on-hover
+              ${selectedCategory === category 
+                ? 'gradient-primary text-white shadow-lg' 
+                : 'gradient-card hover:border-primary/40'
+              }
+            `}
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
-            {category}
+            <span className="relative z-10">{category}</span>
+            {selectedCategory === category && (
+              <div className="absolute inset-0 gradient-primary rounded-md blur-sm opacity-50 -z-10"></div>
+            )}
           </Button>
         ))}
       </div>
@@ -128,8 +157,8 @@ export default function HomePage() {
       {isLoading && displayedProducts.length === 0 ? ( // Loading state for search/filter
          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
          {[...Array(4)].map((_, i) => (
-           <div key={i} className="space-y-2">
-             <Skeleton className="h-48 w-full" />
+           <div key={i} className="space-y-3 animate-pulse">
+             <div className="h-48 w-full gradient-card rounded-lg shimmer"></div>
              <Skeleton className="h-6 w-3/4" />
              <Skeleton className="h-4 w-1/2" />
              <Skeleton className="h-10 w-full" />
@@ -137,7 +166,9 @@ export default function HomePage() {
          ))}
        </div>
       ) : (
-        <ProductGrid products={displayedProducts} />
+        <div className="relative">
+          <ProductGrid products={displayedProducts} />
+        </div>
       )}
     </div>
   );
